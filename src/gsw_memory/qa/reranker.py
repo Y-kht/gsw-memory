@@ -8,7 +8,6 @@ reranking entity summaries by relevance to the user's question.
 from typing import List, Tuple
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from langchain_voyageai import VoyageAIEmbeddings
 
 class SummaryReranker:
     """
@@ -19,14 +18,20 @@ class SummaryReranker:
     rerank_summaries function from the original gsw_qa.py.
     """
     
-    def __init__(self, embedding_model_name: str = "voyage-3"):
+    def __init__(self, embedding_model=None):
         """
-        Initialize the summary reranker.
-        
-        Args:
-            embedding_model_name: Name of VoyageAI model to use
-        """
-        self.embedding_model_name = embedding_model_name
+    	Initialize the summary reranker.
+
+    	Args:
+        	embedding_model: Any object with embed_query(str) and 
+                embed_documents(List[str]) methods
+                (e.g. LangChain-compatible embeddings).
+    	"""
+        if embedding_model is None:
+            # Fall back to VoyageAI if nothing is provided (original behavior)
+            from langchain_voyageai import VoyageAIEmbeddings
+            embedding_model = VoyageAIEmbeddings(model="voyage-3")
+        self.embedding_model = embedding_model
         
     def rerank_summaries(
         self,
@@ -66,7 +71,7 @@ class SummaryReranker:
             return []
 
         # Initialize VoyageAI embedding model
-        embedding_model = VoyageAIEmbeddings(model=self.embedding_model_name)
+        embedding_model = self.embedding_model
 
         # Get question embedding
         question_embedding = embedding_model.embed_query(question)

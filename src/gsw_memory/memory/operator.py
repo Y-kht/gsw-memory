@@ -302,7 +302,6 @@ class GSWProcessor:
                     generation_params=self.generation_params,
                     prompt_type=self.prompt_type,
                     backend="openai",
-                    response_format=GSWStructure,  # Use constrained decoding
                     batch=self.batched,
                     backend_params={"batch_size": self.batch_size,
                                     "require_all_responses": False},
@@ -313,7 +312,6 @@ class GSWProcessor:
                     generation_params=self.generation_params,
                     prompt_type=self.prompt_type,
                     backend="openai",
-                    response_format=GSWStructure,  # Use constrained decoding
                     batch=self.batched,
                     backend_params={"require_all_responses": False},
                 )

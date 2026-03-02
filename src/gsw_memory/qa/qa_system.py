@@ -38,7 +38,7 @@ class GSWQuestionAnswerer:
             EntitySummaryAggregator, List[EntitySummaryAggregator]
         ],
         llm_config: Dict[str, Any],
-        embedding_model: str = "voyage-3",
+        embedding_model=None,
     ):
         """
         Initialize the Q&A system.
@@ -47,7 +47,8 @@ class GSWQuestionAnswerer:
             gsw: GSW structure(s) to query - single GSWStructure or list of GSWStructures
             entity_aggregator: Pre-computed entity summaries - single aggregator or list matching GSWs
             llm_config: LLM configuration for entity extraction
-            embedding_model: Embedding model name for reranking
+            embedding_model: Any object with embed_query() and embed_documents() methods,
+            or None to fall back to VoyageAI.
         """
         # Handle backward compatibility: convert single inputs to lists
         if isinstance(gsw, GSWStructure):

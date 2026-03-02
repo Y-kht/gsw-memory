@@ -105,23 +105,27 @@ class GSWOperator(curator.LLM):
             },
         ]
 
-    def parse(self, input, response: GSWStructure):
-        """Parse the LLM response - already a validated GSWStructure Pydantic object!"""
-        # Convert Pydantic object to dict for PyArrow serialization
-        gsw_dict = response.model_dump() if response else None
+    def parse(self, input, response):
+        """Parse the LLM response to extract text and graph."""
+        # Handle both dict (completions object) and plain string responses
+        if isinstance(response, dict):
+            graph_text = response["choices"][0]["message"]["content"]
+        else:
+            graph_text = str(response)
+
         parsed_response = {
             "text": input["text"],
             "idx": input.get("idx", 0),
-            "gsw": gsw_dict,  # Convert to dict for PyArrow compatibility
+            "gsw": None,
+            "graph": graph_text,
             "context": input.get("context", ""),
             "doc_idx": input.get("doc_idx", input.get("idx", 0)),
             "global_id": input.get("global_id", "unknown"),
         }
 
-        # Include sentence indices if available
         if "start_sentence" in input:
             parsed_response["start_sentence"] = input["start_sentence"]
         if "end_sentence" in input:
             parsed_response["end_sentence"] = input["end_sentence"]
 
-        return parsed_response
+        return parsed_response 
